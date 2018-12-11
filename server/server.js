@@ -13,17 +13,21 @@ var io = socketIO(server);
 
 app.use(express.static(publicPath));
 
+// io vs socket
+// io emits to every connection
+// socket emits to individual connections
+
 io.on('connection', (socket) => {
     console.log('New user connected');
 
-    socket.emit('newMessage', {
-        from: 'kristin21',
-        text: 'Hi munchkin',
-        createdAt: 123123
-    });
+    socket.on('createMessage', (message) => {
+        console.log('createMessage', message);
 
-    socket.on('createMessage', (newMessage) => {
-        console.log('createMessage', newMessage);
+        io.emit('newMessage', {
+            from: message.from,
+            text: message.text,
+            createdAt: new Date().getTime()
+        });
     });
 })
 
