@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
-var {generateMessage} = require('./utils/message');
+var {generateMessage, generateLocationMessage} = require('./utils/message');
 
 
 const port = process.env.PORT || 3000;
@@ -31,9 +31,10 @@ io.on('connection', (socket) => {
 
         io.emit('newMessage', generateMessage(message.from, message.text));
         callback('this is from the server.');
+    });
 
-        // Sends to everyone except person who sent it
-        // socket.broadcast.emit('newMessage', generateMessage(message.from, message.text));
+    socket.on('createLocationMessage', (coords) => {
+        io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
     });
 })
 
