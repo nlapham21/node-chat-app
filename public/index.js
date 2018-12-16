@@ -7,7 +7,11 @@ socket.on('connect', function () {
 
 socket.on('updateRoomList', function (rooms) {
     var ol = jQuery('<ol></ol>');
-
+    var roomsLabel = '';
+    if (rooms.length > 0) {
+        roomsLabel = 'Current chat rooms:';
+    }
+    
     rooms.forEach(function (room) {
         var roomButton = jQuery('<button></button>').text(room)
         roomButton.on('click', function () {
@@ -16,5 +20,6 @@ socket.on('updateRoomList', function (rooms) {
         ol.append(roomButton);
     });
 
+    jQuery('#rooms-label').html(roomsLabel);
     jQuery('#rooms').html(ol);
 });
