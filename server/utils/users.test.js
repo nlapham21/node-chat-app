@@ -90,4 +90,39 @@ describe('Users', () => {
 
         expect(userList).toEqual(['Munchkin']);
     });
+
+    it('should not find a user with the same name in room', () => {
+        var user = {
+            id: '2',
+            name: 'Baxter',
+            room: 'Node Course'
+        };
+        var isUsernameTaken = users.isUsernameTaken(user.name, user.room);
+
+        expect(isUsernameTaken).toBe(false);
+    });
+
+    it('should find a user with the same name in room', () => {
+        var user = {
+            id: '2',
+            name: 'Nolan',
+            room: 'Node Course'
+        };
+        var isUsernameTaken = users.isUsernameTaken(user.name, user.room);
+
+        expect(isUsernameTaken).toBe(true);
+    });
+
+    it('should return a list of rooms', () => {
+        var rooms = users.getRoomsList();
+
+        expect(rooms).toEqual(["Node Course", "React Course"]);
+    });
+
+    it('should return an empty list of rooms', () => {
+        var localUsers = new Users();
+        var rooms = localUsers.getRoomsList();
+
+        expect(rooms).toEqual([]);
+    });
 });

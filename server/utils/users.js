@@ -1,3 +1,4 @@
+const _ = require('lodash');
 
 class Users {
     constructor () {
@@ -28,6 +29,20 @@ class Users {
         var users = this.users.filter((user) => user.room === room);
         var namesArray = users.map((user) => user.name);
         return namesArray;
+    }
+
+    getRoomsList() {
+        var rooms = this.users.map((user) => user.room.charAt(0).toUpperCase() + user.room.slice(1));
+        return _.uniq(rooms);
+    }
+
+    isUsernameTaken(name, room) {
+        var users = this.users.filter((user) => user.room === room);
+        var user = users.filter((user) => user.name === name)[0];
+        if (user) {
+            return true;
+        }
+        return false;
     }
 }
 

@@ -21,18 +21,28 @@ app.use(express.static(publicPath));
 // socket emits to individual connections
 
 io.on('connection', (socket) => {
-    console.log('New user connected');
+
+    socket.on('mainPage', () => {
+        socket.emit('updateRoomList', users.getRoomsList());
+    });
 
     socket.on('join', (params, callback) => {
-        if (!isRealString(params.name) || !isRealString(params.room)) {
+        var room = params.room.toLowerCase();
+        var name = params.name;
+
+        if (!isRealString(name) || !isRealString(room)) {
             return callback('Name and room name are required.');
         }
+        if (users.isUsernameTaken(name, room)) {
+            return callback('This username is taken, please use another.');
+        }
 
-        socket.join(params.room);
+        socket.join(room);
         // socket.leave(params.name) would kick the person out of the socket
         users.removeUser(socket.id);
-        users.addUser(socket.id, params.name, params.room);
-        io.to(params.room).emit('updateUserList', users.getUserList(params.room));
+        users.addUser(socket.id, name, room);
+        io.to(room).emit('updateUserList', users.getUserList(room));
+        io.emit('updateRoomList', users.getRoomsList());
 
         // How to target users
         // io.emit -> io.to(params.name).emit
@@ -40,7 +50,7 @@ io.on('connection', (socket) => {
         // socket.emit (target a specific user)
 
         socket.emit('newMessage', generateMessage('Admin','Welcome to the chat app'));
-        socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin',`${params.name} has joined`));    
+        socket.broadcast.to(room).emit('newMessage', generateMessage('Admin',`${name} has joined`));    
         
         callback();
     });
@@ -68,6 +78,7 @@ io.on('connection', (socket) => {
         if (user) {
             io.to(user.room).emit('updateUserList', users.getUserList(user.room));
             io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left.`));
+            io.emit('updateRoomList', users.getRoomsList());
         }
     });
 })
